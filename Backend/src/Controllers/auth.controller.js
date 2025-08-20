@@ -226,8 +226,7 @@ export const updateProfile = async (req, res) => {
     if (location !== undefined) user.location = location;
 
     if (req.file) {
-      user.profileImg = `https://quick-port-backend.vercel.app/uploads/${req.file.filename}`;
-      // user.profileImg = `http://localhost:3000/uploads/${req.file.filename}`;
+      user.profileImg = `${process.env.Backend_Url}//uploads/${req.file.filename}`;
     }
 
     await user.save();

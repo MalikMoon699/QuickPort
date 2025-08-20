@@ -42,15 +42,14 @@ const Login = () => {
     }
     try {
       setLoading(true);
-      const response = await fetch(
-        "https://quick-port-backend.vercel.app/api/auth/send-otp",
-        {
-          // const response = await fetch("http://localhost:3000/api/auth/send-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        }
-      );
+          const response = await fetch(
+            `${import.meta.env.VITE_BACKEND_URL}/api/auth/send-otp`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email }),
+            }
+          );
       const data = await response.json();
       if (response.ok) {
         setOtpModal(true);
@@ -112,8 +111,12 @@ const Login = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <button className="btn btn-primary" onClick={handleLogin}>
-            {loading ? "Sending..." : "Continue"}
+          <button
+            style={loading ? { backgroundColor: "#0000003d", cursor: "not-allowed" }:{}}
+            className="btn btn-primary"
+            onClick={handleLogin}
+          >
+            {loading ? "Loading..." : "Continue"}
           </button>
 
           <div className="divider">

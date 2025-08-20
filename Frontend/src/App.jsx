@@ -9,28 +9,32 @@ import "./assets/styles/App.css";
 import "./assets/styles/Model.css";
 
 const App = () => {
-  const { authAllow, loading } = useAuth();
+  const { authAllow, loading, isDetail } = useAuth();
 
   if (loading) return null;
 
   return (
-    <>
-      <Routes>
-        {authAllow ? (
+    <Routes>
+      {authAllow ? (
+        isDetail ? (
           <>
             <Route path="/" element={<Home />} />
-            <Route path="/signup-details" element={<SignupDetails />} />
             <Route path="*" element={<Navigate to="/" />} />
           </>
         ) : (
           <>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="*" element={<Navigate to="/login" />} />
+            <Route path="/signup-details" element={<SignupDetails />} />
+            <Route path="*" element={<Navigate to="/signup-details" />} />
           </>
-        )}
-      </Routes>
-    </>
+        )
+      ) : (
+        <>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="*" element={<Navigate to="/login" />} />
+        </>
+      )}
+    </Routes>
   );
 };
 

@@ -4,7 +4,7 @@ import React from "react";
 import { useAuth } from "../context/AuthContext";
 
 const Home = () => {
-  const { userData } = useAuth();
+  const { userData, logout } = useAuth();
   const email = userData?.email || "guest";
 
   return (
@@ -15,6 +15,7 @@ const Home = () => {
           Name: {userData.firstName} {userData.lastName}
         </p>
       )}
+      <button onClick={logout}>logout</button>
     </div>
   );
 };

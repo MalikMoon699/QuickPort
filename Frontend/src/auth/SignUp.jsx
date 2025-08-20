@@ -22,15 +22,14 @@ const SignUp = () => {
     }
     try {
       setLoading(true);
-      const response = await fetch(
-        "https://quick-port-backend.vercel.app/api/auth/send-otp",
-        {
-          // const response = await fetch("http://localhost:3000/api/auth/send-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, type }),
-        }
-      );
+          const response = await fetch(
+            `${import.meta.env.VITE_BACKEND_URL}/api/auth/send-otp`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, type }),
+            }
+          );
       const data = await response.json();
       if (response.ok) {
         setOtpModal(true);
@@ -85,9 +84,11 @@ const SignUp = () => {
             className="btn btn-primary"
             style={{
               backgroundColor:
-                !email || !email.includes("@") ? "#0000003d" : "",
+                !email || !email.includes("@") || loading ? "#0000003d" : "",
               cursor:
-                !email || !email.includes("@") ? "not-allowed" : "pointer",
+                !email || !email.includes("@") || loading
+                  ? "not-allowed"
+                  : "pointer",
             }}
           >
             {loading ? "Loading..." : "Continue"}

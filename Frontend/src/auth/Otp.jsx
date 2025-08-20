@@ -50,34 +50,33 @@ const Otp = ({ email, setEmail, setOtpModal }) => {
       return;
     }
     try {
-      const res = await fetch(
-        "https://quick-port-backend.vercel.app/api/auth/verify-otp",
-        {
-          // const res = await fetch("http://localhost:3000/api/auth/verify-otp", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, otp: enteredOtp }),
-        }
-      );
+          const res = await fetch(
+            `${import.meta.env.VITE_BACKEND_URL}/api/auth/verify-otp`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ email, otp: enteredOtp }),
+            }
+          );
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        const userRes = await fetch(
-          "https://quick-port-backend.vercel.app/api/auth/user",
-          {
-            // const userRes = await fetch("http://localhost:3000/api/auth/user", {
-            headers: { Authorization: `Bearer ${data.token}` },
-          }
-        );
+            const userRes = await fetch(
+              `${import.meta.env.VITE_BACKEND_URL}/api/auth/user`,
+              {
+                headers: { Authorization: `Bearer ${data.token}` },
+              }
+            );
         const userData = await userRes.json();
         if (userRes.ok) {
           setUserData(userData.user);
           toast.success(data.message);
-          setOtpModal(false);
           setEmail("");
-          navigate("/signup-details");
+          navigate("/");
+          setOtpModal(false);
+          window.location.reload();
         } else {
           toast.error(userData.message || "Failed to load user");
           setEmail("");
@@ -97,15 +96,14 @@ const Otp = ({ email, setEmail, setOtpModal }) => {
     setOtp(["", "", "", ""]);
     setTimeLeft(70);
     try {
-      const res = await fetch(
-        "https://quick-port-backend.vercel.app/api/auth/send-otp",
-        {
-          // const res = await fetch("http://localhost:3000/api/auth/send-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        }
-      );
+          const res = await fetch(
+            `${import.meta.env.VITE_BACKEND_URL}/api/auth/send-otp`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email }),
+            }
+          );
       const data = await res.json();
       if (res.ok) toast.success("OTP resent successfully");
       else toast.error(data.message || "Failed to resend");

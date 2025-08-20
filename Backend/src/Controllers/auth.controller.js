@@ -200,44 +200,55 @@ export const getUserData = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { email } = req.user || {};
-    if (!email) return res.status(401).json({ message: "Unauthorized" });
-
-    let { user } = await findUserByEmail(email);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    const { firstName, lastName, phoneNumber, gender, dob, location } =
-      req.body;
-
-    if (phoneNumber && phoneNumber.replace(/\D/g, "").length < 10) {
-      return res
-        .status(400)
-        .json({ message: "Phone number must be at least 10 digits" });
-    }
-    if (gender && !["Male", "Female", "Other", ""].includes(gender)) {
-      return res.status(400).json({ message: "Invalid gender value" });
+    const { email } = req.user;
+    if (!email) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    if (firstName !== undefined) user.firstName = firstName;
-    if (lastName !== undefined) user.lastName = lastName;
-    if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
-    if (gender !== undefined) user.gender = gender;
-    if (dob !== undefined) user.dob = dob;
-    if (location !== undefined) user.location = location;
+    // Find user based on role
+    let user = await Rider.findOne({ email });
+    let role = "rider";
+
+    if (!user) {
+      user = await Driver.findOne({ email });
+      role = "driver";
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update fields based on role
+    if (role === "rider") {
+      user.firstName = req.body.firstName || user.firstName;
+      user.lastName = req.body.lastName || user.lastName;
+      user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
+      user.gender = req.body.gender || user.gender;
+    } else {
+      user.firstName = req.body.firstName || user.firstName;
+      user.lastName = req.body.lastName || user.lastName;
+      user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
+      user.gender = req.body.gender || user.gender;
+      user.CNIC = req.body.cnicNumber || user.CNIC;
+      user.rideType = req.body.rideType || user.rideType;
+      user.rideNumber = req.body.rideNumber || user.rideNumber;
+      user.rideBrand = req.body.rideBrand || user.rideBrand;
+    }
 
     if (req.file) {
-      user.profileImg = `${process.env.Backend_Url}//uploads/${req.file.filename}`;
+      user.profileImg = `/Uploads/${req.file.filename}`;
     }
 
     await user.save();
-    const { otp, otpExpires, ...obj } = user.toObject();
-    res
-      .status(200)
-      .json({ message: "Profile updated successfully", user: obj });
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    res
-      .status(500)
-      .json({ message: `Failed to update profile: ${error.message}` });
+
+    const { otp, otpExpires, ...userObj } = user.toObject();
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: userObj,
+      role,
+    });
+  } catch (err) {
+    console.error("updateProfile error:", err);
+    res.status(500).json({ message: "Error updating profile" });
   }
 };

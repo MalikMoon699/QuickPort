@@ -23,6 +23,6 @@ router.post("/verify-otp", verifyOtp);
 
 // Authenticated user ops
 router.get("/user", verifyToken, getUserData);
-router.put("/update-profile", verifyToken, uploadProfileImage, updateProfile);
+router.put("/update", verifyToken, uploadProfileImage, updateProfile);
 
 export default router;

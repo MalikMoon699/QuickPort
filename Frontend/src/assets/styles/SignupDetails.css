@@ -1,0 +1,108 @@
+.signup-details-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  height: 100vh;
+  width: 100vw;
+}
+
+.signup-details-title {
+  margin-bottom: 30px;
+  font-size: 45px;
+  font-weight: 700;
+  width: 100%;
+  text-align: center;
+}
+
+.signup-profile-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.signup-profile-image-container > img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0px 0px 20px #00000010;
+  cursor: pointer;
+  border: 2px solid #ff00007d;
+  padding: 2px;
+}
+
+.signup-profile-image-container > input {
+  display: none;
+}
+
+.signup-details-inputs {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.signup-details-inputs > input,
+.signup-details-inputs > select {
+  width: 100%;
+  padding: 13px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.148);
+  border-radius: 8px;
+  font-size: 17px;
+  margin-bottom: 30px;
+  outline: none;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0px 0px 20px #00000010;
+}
+
+.signup-details-inputs > select {
+  cursor: pointer;
+}
+
+.signup-details-inputs > input:focus {
+  border: 2px solid red;
+}
+
+.signup-details-btn-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.signup-details-btn-container > button {
+  width: 100%;
+  padding: 13px 10px;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 17px;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0px 0px 20px #00000010;
+  transition: all 0.3s ease-in-out;
+
+}
+
+.signup-details-btn-container > button:nth-child(1) {
+  background-color: red;
+}
+
+.signup-details-btn-container > button:nth-child(1):hover {
+  background-color: transparent;
+  color: red;
+  border-color: red;
+}
+
+.signup-details-btn-container > button:nth-child(2) {
+  background-color: black;
+}
+
+.signup-details-btn-container > button:nth-child(2):hover {
+  background-color: transparent;
+  color: black;
+  border-color: black;
+}

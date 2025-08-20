@@ -4,8 +4,10 @@ import { useAuth } from "../context/AuthContext";
 import "../assets/styles/SignupDetails.css";
 import { Placeholder } from "../assets/images/Images";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 const SignupDetails = () => {
+  const navigate = useNavigate();
   const { userData, logout, setUserData } = useAuth();
   const fileInputRef = useRef(null);
   const [profileImg, setProfileImg] = useState(userData?.profileImg || "");

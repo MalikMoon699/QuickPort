@@ -19,6 +19,7 @@ const App = () => {
         isDetail ? (
           <>
             <Route path="/" element={<Home />} />
+            <Route path="/signup-details" element={<SignupDetails />} />
             <Route path="*" element={<Navigate to="/" />} />
           </>
         ) : (

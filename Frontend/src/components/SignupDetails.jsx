@@ -80,7 +80,6 @@ const handleSave = async () => {
     }
 
     const data = await res.json();
-    console.log("Profile updated:", data);
     toast.success("Profile updated successfully!");
     setUserData((prev) => ({ ...prev, ...data.user }));
     navigate("/");

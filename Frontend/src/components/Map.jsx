@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Loader from "./Loader";
 
 const Map = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="home-map-container">

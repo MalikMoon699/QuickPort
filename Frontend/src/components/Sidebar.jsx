@@ -1,5 +1,4 @@
-// Frontend/src/components/Sidebar.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   CalendarDays,
   CircleDot,
@@ -13,6 +12,31 @@ import {
 } from "lucide-react";
 import PickupTime from "./PickupTime";
 
+const loadGoogleMapsScript = (apiKey) => {
+  return new Promise((resolve, reject) => {
+    if (window.google && window.google.maps) {
+      resolve();
+      return;
+    }
+
+    const existingScript = document.getElementById("google-maps-script");
+    if (existingScript) {
+      existingScript.onload = () => resolve();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "google-maps-script";
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    script.onerror = (err) => reject(err);
+
+    document.body.appendChild(script);
+  });
+};
+
 const Sidebar = () => {
   const [startLocation, setStartLocation] = useState("");
   const [endLocation, setEndLocation] = useState("");
@@ -23,6 +47,35 @@ const Sidebar = () => {
   const [pickupDate, setPickupDate] = useState("Today");
   const [pickupSelection, setPickupSelection] = useState("");
   const [pickupSelectionModel, setPickupSelectionModel] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused2, setIsFocused2] = useState(false);
+  const [isFocused3, setIsFocused3] = useState(false);
+  const containerRef = useRef(null);
+
+  const [suggestions, setSuggestions] = useState([]);
+  const [mapsReady, setMapsReady] = useState(false);
+
+  useEffect(() => {
+    loadGoogleMapsScript(import.meta.env.VITE_GOOGLE_MAPS_API_KEY).then(() =>
+      setMapsReady(true)
+    );
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
+        setIsFocused(false);
+        setIsFocused2(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleClear = () => {
     setPickupTime("now");
@@ -37,6 +90,104 @@ const Sidebar = () => {
     month: "short",
     day: "2-digit",
   });
+
+  const handleUseCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const res = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${
+                import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+              }`
+            );
+            const data = await res.json();
+            if (data.results.length > 0) {
+              setStartLocation(data.results[0].formatted_address);
+            }
+            setIsFocused(false);
+            setIsFocused2(false);
+          } catch (err) {
+            console.error("Geocode error:", err);
+          }
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+  useEffect(() => {
+    if (!mapsReady || !startLocation ) {
+      setSuggestions([]);
+      return;
+    }
+
+    const service = new window.google.maps.places.AutocompleteService();
+    service.getPlacePredictions(
+      { input: startLocation, componentRestrictions: { country: "pk" } },
+      (predictions, status) => {
+        if (
+          status === window.google.maps.places.PlacesServiceStatus.OK &&
+          predictions
+        ) {
+          setSuggestions(predictions);
+        } else {
+          setSuggestions([]);
+        }
+      }
+    );
+  }, [startLocation, mapsReady]);
+
+    useEffect(() => {
+      if (!mapsReady || !endLocation) {
+        setSuggestions([]);
+        return;
+      }
+
+      const service = new window.google.maps.places.AutocompleteService();
+      service.getPlacePredictions(
+        { input: endLocation, componentRestrictions: { country: "pk" } },
+        (predictions, status) => {
+          if (
+            status === window.google.maps.places.PlacesServiceStatus.OK &&
+            predictions
+          ) {
+            setSuggestions(predictions);
+          } else {
+            setSuggestions([]);
+          }
+        }
+      );
+    }, [endLocation, mapsReady]);
+
+
+     useEffect(() => {
+       if (!mapsReady || !stopLocation) {
+         setSuggestions([]);
+         return;
+       }
+
+       const service = new window.google.maps.places.AutocompleteService();
+       service.getPlacePredictions(
+         { input: stopLocation, componentRestrictions: { country: "pk" } },
+         (predictions, status) => {
+           if (
+             status === window.google.maps.places.PlacesServiceStatus.OK &&
+             predictions
+           ) {
+             setSuggestions(predictions);
+           } else {
+             setSuggestions([]);
+           }
+         }
+       );
+     }, [stopLocation, mapsReady]);
+
   return (
     <>
       {!isPickupTime ? (
@@ -49,39 +200,51 @@ const Sidebar = () => {
               placeholder="Pickup location"
               value={startLocation}
               onChange={(e) => setStartLocation(e.target.value)}
+              onFocus={() => setIsFocused(true)}
             />
-            {startLocation === "" ? (
-              <div className="home-sidebar-inputs-location-options">
-                <div>
-                  <span>
-                    <MapPin />
-                  </span>
-                  Use current location
+            {isFocused &&
+              (startLocation === "" ? (
+                <div className="home-sidebar-inputs-location-options">
+                  <div
+                    onClick={handleUseCurrentLocation}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <span>
+                      <MapPin />
+                    </span>
+                    Use current location
+                  </div>
+                  <div>
+                    <span>
+                      <LocateFixed />
+                    </span>
+                    Set location on map
+                  </div>
                 </div>
-                <div>
-                  <span>
-                    <LocateFixed />
-                  </span>
-                  Set location on map
+              ) : (
+                <div className="home-sidebar-inputs-location-options">
+                  {suggestions.length > 0 ? (
+                    suggestions.map((sug) => (
+                      <div
+                        key={sug.place_id}
+                        onClick={() => {
+                          setStartLocation(sug.description);
+                          setIsFocused(false);
+                        }}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <MapPin /> {sug.description}
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ justifyContent: "center" }}>
+                      No matches found
+                    </div>
+                  )}
                 </div>
-              </div>
-            ) : (
-              <div className="home-sidebar-inputs-location-options">
-                <div>
-                  <span>
-                    <MapPin />
-                  </span>
-                  here show list of matches Locations
-                </div>
-                <div>
-                  <span>
-                    <LocateFixed />
-                  </span>
-                  Set location on map
-                </div>
-              </div>
-            )}
+              ))}
           </div>
+
           {isStopAdded && (
             <div className="home-sidebar-inputs">
               <Menu size={30} color="black" />
@@ -90,6 +253,7 @@ const Sidebar = () => {
                 placeholder="Add Stop"
                 value={stopLocation}
                 onChange={(e) => setStopLocation(e.target.value)}
+                onFocus={() => setIsFocused3(true)}
               />
               <Trash2
                 style={{ cursor: "pointer" }}
@@ -99,8 +263,31 @@ const Sidebar = () => {
                 }}
                 size={35}
               />
+              {isFocused3 && stopLocation !== "" && (
+                <div className="home-sidebar-inputs-location-options">
+                  {suggestions.length > 0 ? (
+                    suggestions.map((sug) => (
+                      <div
+                        key={sug.place_id}
+                        onClick={() => {
+                          setStopLocation(sug.description);
+                          setIsFocused3(false);
+                        }}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <MapPin /> {sug.description}
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ justifyContent: "center" }}>
+                      No matches found
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
+
           <div className="home-sidebar-inputs">
             <SquareStop size={30} fill="black" color="white" />
             <input
@@ -108,6 +295,7 @@ const Sidebar = () => {
               placeholder="Dropoff location"
               value={endLocation}
               onChange={(e) => setEndLocation(e.target.value)}
+              onFocus={() => setIsFocused2(true)}
             />
             {!isStopAdded && (
               <CirclePlus
@@ -118,7 +306,30 @@ const Sidebar = () => {
                 color="white"
               />
             )}
+            {isFocused2 && endLocation !== "" && (
+              <div className="home-sidebar-inputs-location-options">
+                {suggestions.length > 0 ? (
+                  suggestions.map((sug) => (
+                    <div
+                      key={sug.place_id}
+                      onClick={() => {
+                        setEndLocation(sug.description);
+                        setIsFocused2(false);
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <MapPin /> {sug.description}
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ justifyContent: "center" }}>
+                    No matches found
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+
           <div
             onClick={() => {
               setIsPickupTime(true);
@@ -135,6 +346,7 @@ const Sidebar = () => {
             </p>
             <span>❮</span>
           </div>
+
           <div className="search-ride-btn">
             <button
               className={
@@ -151,6 +363,7 @@ const Sidebar = () => {
         </div>
       ) : (
         <div className="home-sidebar-container">
+          {/* Pickup Time Section */}
           <div className="home-sidebar-header-container">
             <button
               onClick={() => {
@@ -199,6 +412,7 @@ const Sidebar = () => {
           </div>
         </div>
       )}
+
       {pickupSelectionModel && (
         <PickupTime
           setPickupSelectionModel={setPickupSelectionModel}

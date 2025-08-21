@@ -14,8 +14,8 @@ const App = () => {
 
   return (
     <>
-      {loading ? (
-        <Loader className="App-loader" loading={true} size="300" speed="2" />
+      {!loading ? (
+        <Loader className="App-loader" loading={true} size="100" speed="1.5" />
       ) : (
         <Routes>
           {authAllow ? (

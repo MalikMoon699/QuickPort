@@ -37,7 +37,7 @@ const loadGoogleMapsScript = (apiKey) => {
   });
 };
 
-const Sidebar = () => {
+const Sidebar = ({ setLocationType, locationType }) => {
   const [startLocation, setStartLocation] = useState("");
   const [endLocation, setEndLocation] = useState("");
   const [stopLocation, setStopLocation] = useState("");
@@ -47,9 +47,7 @@ const Sidebar = () => {
   const [pickupDate, setPickupDate] = useState("Today");
   const [pickupSelection, setPickupSelection] = useState("");
   const [pickupSelectionModel, setPickupSelectionModel] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const [isFocused2, setIsFocused2] = useState(false);
-  const [isFocused3, setIsFocused3] = useState(false);
+  const [isFocused, setIsFocused] = useState(null);
   const containerRef = useRef(null);
 
   const [suggestions, setSuggestions] = useState([]);
@@ -67,8 +65,7 @@ const Sidebar = () => {
         containerRef.current &&
         !containerRef.current.contains(event.target)
       ) {
-        setIsFocused(false);
-        setIsFocused2(false);
+        setIsFocused(null);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -106,8 +103,8 @@ const Sidebar = () => {
             if (data.results.length > 0) {
               setStartLocation(data.results[0].formatted_address);
             }
-            setIsFocused(false);
-            setIsFocused2(false);
+            setLocationType("start");
+            setIsFocused(null);
           } catch (err) {
             console.error("Geocode error:", err);
           }
@@ -122,7 +119,7 @@ const Sidebar = () => {
   };
 
   useEffect(() => {
-    if (!mapsReady || !startLocation ) {
+    if (!mapsReady || !startLocation) {
       setSuggestions([]);
       return;
     }
@@ -143,50 +140,53 @@ const Sidebar = () => {
     );
   }, [startLocation, mapsReady]);
 
-    useEffect(() => {
-      if (!mapsReady || !endLocation) {
-        setSuggestions([]);
-        return;
-      }
+  useEffect(() => {
+    if (!mapsReady || !endLocation) {
+      setSuggestions([]);
+      return;
+    }
 
-      const service = new window.google.maps.places.AutocompleteService();
-      service.getPlacePredictions(
-        { input: endLocation, componentRestrictions: { country: "pk" } },
-        (predictions, status) => {
-          if (
-            status === window.google.maps.places.PlacesServiceStatus.OK &&
-            predictions
-          ) {
-            setSuggestions(predictions);
-          } else {
-            setSuggestions([]);
-          }
+    const service = new window.google.maps.places.AutocompleteService();
+    service.getPlacePredictions(
+      { input: endLocation, componentRestrictions: { country: "pk" } },
+      (predictions, status) => {
+        if (
+          status === window.google.maps.places.PlacesServiceStatus.OK &&
+          predictions
+        ) {
+          setSuggestions(predictions);
+        } else {
+          setSuggestions([]);
         }
-      );
-    }, [endLocation, mapsReady]);
+      }
+    );
+  }, [endLocation, mapsReady]);
 
+  useEffect(() => {
+    if (!mapsReady || !stopLocation) {
+      setSuggestions([]);
+      return;
+    }
 
-     useEffect(() => {
-       if (!mapsReady || !stopLocation) {
-         setSuggestions([]);
-         return;
-       }
+    const service = new window.google.maps.places.AutocompleteService();
+    service.getPlacePredictions(
+      { input: stopLocation, componentRestrictions: { country: "pk" } },
+      (predictions, status) => {
+        if (
+          status === window.google.maps.places.PlacesServiceStatus.OK &&
+          predictions
+        ) {
+          setSuggestions(predictions);
+        } else {
+          setSuggestions([]);
+        }
+      }
+    );
+  }, [stopLocation, mapsReady]);
 
-       const service = new window.google.maps.places.AutocompleteService();
-       service.getPlacePredictions(
-         { input: stopLocation, componentRestrictions: { country: "pk" } },
-         (predictions, status) => {
-           if (
-             status === window.google.maps.places.PlacesServiceStatus.OK &&
-             predictions
-           ) {
-             setSuggestions(predictions);
-           } else {
-             setSuggestions([]);
-           }
-         }
-       );
-     }, [stopLocation, mapsReady]);
+  const handleFocus = (id) => {
+    setIsFocused(id);
+  };
 
   return (
     <>
@@ -200,9 +200,9 @@ const Sidebar = () => {
               placeholder="Pickup location"
               value={startLocation}
               onChange={(e) => setStartLocation(e.target.value)}
-              onFocus={() => setIsFocused(true)}
+              onFocus={() => handleFocus("start")}
             />
-            {isFocused &&
+            {isFocused === "start" &&
               (startLocation === "" ? (
                 <div className="home-sidebar-inputs-location-options">
                   <div
@@ -214,7 +214,12 @@ const Sidebar = () => {
                     </span>
                     Use current location
                   </div>
-                  <div>
+                  <div
+                    onClick={() => {
+                      setLocationType("start");
+                      setIsFocused(null);
+                    }}
+                  >
                     <span>
                       <LocateFixed />
                     </span>
@@ -229,7 +234,8 @@ const Sidebar = () => {
                         key={sug.place_id}
                         onClick={() => {
                           setStartLocation(sug.description);
-                          setIsFocused(false);
+                          setLocationType("start");
+                          setIsFocused(null);
                         }}
                         style={{ cursor: "pointer" }}
                       >
@@ -253,7 +259,7 @@ const Sidebar = () => {
                 placeholder="Add Stop"
                 value={stopLocation}
                 onChange={(e) => setStopLocation(e.target.value)}
-                onFocus={() => setIsFocused3(true)}
+                onFocus={() => handleFocus("stop")}
               />
               <Trash2
                 style={{ cursor: "pointer" }}
@@ -263,15 +269,91 @@ const Sidebar = () => {
                 }}
                 size={35}
               />
-              {isFocused3 && stopLocation !== "" && (
+              {isFocused === "stop" &&
+                (stopLocation === "" ? (
+                  <div className="home-sidebar-inputs-location-options">
+                    <div
+                      onClick={() => {
+                        setLocationType("stop");
+                        setIsFocused(null);
+                      }}
+                    >
+                      <span>
+                        <LocateFixed />
+                      </span>
+                      Set location on map
+                    </div>
+                  </div>
+                ) : (
+                  <div className="home-sidebar-inputs-location-options">
+                    {suggestions.length > 0 ? (
+                      suggestions.map((sug) => (
+                        <div
+                          key={sug.place_id}
+                          onClick={() => {
+                            setStopLocation(sug.description);
+                            setLocationType("stop");
+                            setIsFocused(null);
+                          }}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <MapPin /> {sug.description}
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ justifyContent: "center" }}>
+                        No matches found
+                      </div>
+                    )}
+                  </div>
+                ))}
+            </div>
+          )}
+
+          <div className="home-sidebar-inputs">
+            <SquareStop size={30} fill="black" color="white" />
+            <input
+              type="text"
+              placeholder="Dropoff location"
+              value={endLocation}
+              onChange={(e) => setEndLocation(e.target.value)}
+              onFocus={() => handleFocus("end")}
+            />
+            {!isStopAdded && (
+              <CirclePlus
+                style={{ cursor: "pointer" }}
+                onClick={() => setIsStopAdded(true)}
+                size={35}
+                fill="black"
+                color="white"
+              />
+            )}
+            {isFocused === "end" &&
+              (endLocation === "" ? (
+                <div className="home-sidebar-inputs-location-options">
+                  <div
+                    onClick={() => {
+                      setLocationType("drop");
+                        setLocationType("end");
+                      setIsFocused(null);
+                    }}
+                  >
+                    <span>
+                      <LocateFixed />
+                    </span>
+                    Set location on map
+                  </div>
+                </div>
+              ) : (
                 <div className="home-sidebar-inputs-location-options">
                   {suggestions.length > 0 ? (
                     suggestions.map((sug) => (
                       <div
                         key={sug.place_id}
                         onClick={() => {
-                          setStopLocation(sug.description);
-                          setIsFocused3(false);
+                          setEndLocation(sug.description);
+                          setLocationType("end");
+                          setIsFocused(null);
                         }}
                         style={{ cursor: "pointer" }}
                       >
@@ -284,50 +366,7 @@ const Sidebar = () => {
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-          )}
-
-          <div className="home-sidebar-inputs">
-            <SquareStop size={30} fill="black" color="white" />
-            <input
-              type="text"
-              placeholder="Dropoff location"
-              value={endLocation}
-              onChange={(e) => setEndLocation(e.target.value)}
-              onFocus={() => setIsFocused2(true)}
-            />
-            {!isStopAdded && (
-              <CirclePlus
-                style={{ cursor: "pointer" }}
-                onClick={() => setIsStopAdded(true)}
-                size={35}
-                fill="black"
-                color="white"
-              />
-            )}
-            {isFocused2 && endLocation !== "" && (
-              <div className="home-sidebar-inputs-location-options">
-                {suggestions.length > 0 ? (
-                  suggestions.map((sug) => (
-                    <div
-                      key={sug.place_id}
-                      onClick={() => {
-                        setEndLocation(sug.description);
-                        setIsFocused2(false);
-                      }}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <MapPin /> {sug.description}
-                    </div>
-                  ))
-                ) : (
-                  <div style={{ justifyContent: "center" }}>
-                    No matches found
-                  </div>
-                )}
-              </div>
-            )}
+              ))}
           </div>
 
           <div

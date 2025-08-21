@@ -11,6 +11,7 @@ import Map from "../components/Map";
 const Home = () => {
   const { userData } = useAuth();
   const [isProfileDetails, setIsProfileDetails] = useState(false);
+  const [locationType, setLocationType] = useState(null);
 
   return (
     <div className="home-container">
@@ -31,7 +32,10 @@ const Home = () => {
         </div>
       </div>
       <div className="home-main-container">
-        <Sidebar />
+        <Sidebar
+          setLocationType={setLocationType}
+          locationType={locationType}
+        />
         <Map />
       </div>
       {isProfileDetails && (

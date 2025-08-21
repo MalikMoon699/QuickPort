@@ -14,7 +14,7 @@ const App = () => {
 
   return (
     <>
-      {!loading ? (
+      {loading ? (
         <Loader className="App-loader" loading={true} size="100" speed="1.5" />
       ) : (
         <Routes>

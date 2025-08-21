@@ -7,35 +7,40 @@ import SignupDetails from "./components/SignupDetails";
 import { useAuth } from "./context/AuthContext";
 import "./assets/styles/App.css";
 import "./assets/styles/Model.css";
+import Loader from "./components/Loader";
 
 const App = () => {
   const { authAllow, loading, isDetail } = useAuth();
 
-  if (loading) return null;
-
   return (
-    <Routes>
-      {authAllow ? (
-        isDetail ? (
-          <>
-            <Route path="/" element={<Home />} />
-            <Route path="/signup-details" element={<SignupDetails />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </>
-        ) : (
-          <>
-            <Route path="/signup-details" element={<SignupDetails />} />
-            <Route path="*" element={<Navigate to="/signup-details" />} />
-          </>
-        )
+    <>
+      {loading ? (
+        <Loader className="App-loader" loading={true} size="300" speed="2" />
       ) : (
-        <>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="*" element={<Navigate to="/login" />} />
-        </>
+        <Routes>
+          {authAllow ? (
+            isDetail ? (
+              <>
+                <Route path="/" element={<Home />} />
+                <Route path="/signup-details" element={<SignupDetails />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </>
+            ) : (
+              <>
+                <Route path="/signup-details" element={<SignupDetails />} />
+                <Route path="*" element={<Navigate to="/signup-details" />} />
+              </>
+            )
+          ) : (
+            <>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="*" element={<Navigate to="/login" />} />
+            </>
+          )}
+        </Routes>
       )}
-    </Routes>
+    </>
   );
 };
 

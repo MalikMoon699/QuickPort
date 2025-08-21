@@ -6,6 +6,14 @@
   scrollbar-width: none;
 }
 
+.App-loader{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+}
+
 /* ------------- main.css ------------- */
 .home-main-container {
   display: flex;

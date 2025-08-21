@@ -7,6 +7,7 @@ import SignupDetails from "./components/SignupDetails";
 import { useAuth } from "./context/AuthContext";
 import "./assets/styles/App.css";
 import "./assets/styles/Model.css";
+import "./assets/styles/Responsive.css";
 import Loader from "./components/Loader";
 
 const App = () => {

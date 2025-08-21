@@ -1,0 +1,51 @@
+@media screen and (max-width: 768px) {
+  .home-main-container {
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .home-sidebar-up-down-btn {
+    display: block;
+  }
+
+  .home-sidebar-container {
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+    top: 0;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .home-map-container {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .modal-content {
+    min-width: 300px;
+  }
+
+  .signup-details-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    width: 100%;
+  }
+
+  .signup-details-inputs > input, .signup-details-inputs > select{
+    margin-bottom:10px;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .header-user-info > span {
+    display: none;
+  }
+  .auth-header {
+    padding: 10px 6px !important;
+  }
+}

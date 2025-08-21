@@ -139,11 +139,34 @@
   box-shadow: inset 0px 0px 10px #ff080812;
 }
 
-@media screen and (max-width: 360px) {
-  .header-user-info > span {
-    display: none;
-  }
-  .auth-header {
-    padding: 10px 6px !important;
-  }
+.map-selection-mode {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  padding: 10px;
+  background: #00000042;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.map-selection-mode > button {
+  padding: 10px 20px;
+  background: white;
+  color: black;
+  border: 1px solid white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease-in-out;
+}
+
+.map-selection-mode > button:hover {
+  background: transparent;
+  color: white;
+  border: 1px solid black;
 }

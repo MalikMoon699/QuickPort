@@ -46,6 +46,7 @@ const Home = () => {
           setStopLocation={setStopLocation}
         />
         <Map
+          setLocationType={setLocationType}
           locationType={locationType}
           startLocation={startLocation}
           setStartLocation={setStartLocation}

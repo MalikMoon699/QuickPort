@@ -7,10 +7,15 @@ import "../assets/styles/Home.css";
 import UpdateUserDetails from "../components/UpdateUserDetails";
 import Sidebar from "../components/Sidebar";
 import Map from "../components/Map";
+import Loader from "../components/Loader";
 
 const Home = () => {
-  const { userData } = useAuth();
+  const { userData,loading } = useAuth();
   const [isProfileDetails, setIsProfileDetails] = useState(false);
+
+  if (loading){
+    return (<Loader loading={true} size="300" speed="2"/>)
+  }
 
   return (
     <div className="home-container">

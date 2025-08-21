@@ -5,10 +5,11 @@ import { useAuth } from "../context/AuthContext";
 import { Placeholder, WhiteLogo } from "../assets/images/Images";
 import "../assets/styles/Home.css";
 import UpdateUserDetails from "../components/UpdateUserDetails";
+import Sidebar from "../components/Sidebar";
+import Map from "../components/Map";
 
 const Home = () => {
-  const { userData, logout } = useAuth();
-  const email = userData?.email || "guest";
+  const { userData } = useAuth();
   const [isProfileDetails, setIsProfileDetails] = useState(false);
 
   return (
@@ -29,13 +30,10 @@ const Home = () => {
           <span>❮</span>
         </div>
       </div>
-      <h1>Welcome to QuickPort, {email}</h1>
-      {userData?.firstName && (
-        <p>
-          Name: {userData.firstName} {userData.lastName}
-        </p>
-      )}
-      <button onClick={logout}>logout</button>
+      <div className="home-main-container">
+        <Sidebar />
+        <Map />
+      </div>
       {isProfileDetails && (
         <UpdateUserDetails setIsProfileDetails={setIsProfileDetails} />
       )}

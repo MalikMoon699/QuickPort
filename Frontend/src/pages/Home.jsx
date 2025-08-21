@@ -12,6 +12,9 @@ const Home = () => {
   const { userData } = useAuth();
   const [isProfileDetails, setIsProfileDetails] = useState(false);
   const [locationType, setLocationType] = useState(null);
+  const [startLocation, setStartLocation] = useState("");
+  const [endLocation, setEndLocation] = useState("");
+  const [stopLocation, setStopLocation] = useState("");
 
   return (
     <div className="home-container">
@@ -35,8 +38,22 @@ const Home = () => {
         <Sidebar
           setLocationType={setLocationType}
           locationType={locationType}
+          startLocation={startLocation}
+          setStartLocation={setStartLocation}
+          endLocation={endLocation}
+          setEndLocation={setEndLocation}
+          stopLocation={stopLocation}
+          setStopLocation={setStopLocation}
         />
-        <Map />
+        <Map
+          locationType={locationType}
+          startLocation={startLocation}
+          setStartLocation={setStartLocation}
+          endLocation={endLocation}
+          setEndLocation={setEndLocation}
+          stopLocation={stopLocation}
+          setStopLocation={setStopLocation}
+        />
       </div>
       {isProfileDetails && (
         <UpdateUserDetails setIsProfileDetails={setIsProfileDetails} />

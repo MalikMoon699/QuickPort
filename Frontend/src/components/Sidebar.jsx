@@ -37,10 +37,7 @@ const loadGoogleMapsScript = (apiKey) => {
   });
 };
 
-const Sidebar = ({ setLocationType, locationType }) => {
-  const [startLocation, setStartLocation] = useState("");
-  const [endLocation, setEndLocation] = useState("");
-  const [stopLocation, setStopLocation] = useState("");
+const Sidebar = ({ setLocationType, locationType, startLocation, setStartLocation, endLocation, setEndLocation, stopLocation, setStopLocation }) => {
   const [isStopAdded, setIsStopAdded] = useState(false);
   const [isPickupTime, setIsPickupTime] = useState(false);
   const [pickupTime, setPickupTime] = useState("now");

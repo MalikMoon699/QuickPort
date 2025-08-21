@@ -1,9 +1,12 @@
+// Frontend/src/components/Sidebar.jsx
 import React, { useState } from "react";
 import {
   CalendarDays,
   CircleDot,
   CirclePlus,
   Clock,
+  LocateFixed,
+  MapPin,
   Menu,
   SquareStop,
   Trash2,
@@ -47,6 +50,37 @@ const Sidebar = () => {
               value={startLocation}
               onChange={(e) => setStartLocation(e.target.value)}
             />
+            {startLocation === "" ? (
+              <div className="home-sidebar-inputs-location-options">
+                <div>
+                  <span>
+                    <MapPin />
+                  </span>
+                  Use current location
+                </div>
+                <div>
+                  <span>
+                    <LocateFixed />
+                  </span>
+                  Set location on map
+                </div>
+              </div>
+            ) : (
+              <div className="home-sidebar-inputs-location-options">
+                <div>
+                  <span>
+                    <MapPin />
+                  </span>
+                  here show list of matches Locations
+                </div>
+                <div>
+                  <span>
+                    <LocateFixed />
+                  </span>
+                  Set location on map
+                </div>
+              </div>
+            )}
           </div>
           {isStopAdded && (
             <div className="home-sidebar-inputs">
@@ -94,8 +128,7 @@ const Sidebar = () => {
             <Clock size={25} />
             <p>
               pickup{" "}
-              {pickupDate === formattedCurrentDate ||
-              pickupDate === "Today"
+              {pickupDate === formattedCurrentDate || pickupDate === "Today"
                 ? ""
                 : shortDate}{" "}
               {pickupDate !== formattedCurrentDate ? pickupTime : "now"}

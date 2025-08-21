@@ -42,6 +42,7 @@
 }
 
 .home-sidebar-inputs {
+  position: relative;
   padding: 0px 10px;
   background: #00000017;
   border: 1px solid transparent;
@@ -67,6 +68,49 @@
 
 .home-sidebar-inputs:focus-within {
   border: 1px solid black;
+}
+
+.home-sidebar-inputs:focus-within .home-sidebar-inputs-location-options {
+  display: block !important;
+}
+
+.home-sidebar-inputs-location-options {
+  display: none;
+  position: absolute;
+  top: 95%;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #000000;
+  border-radius:0px 0px 8px 8px;
+  box-shadow: 0px 0px 10px #0000001f;
+  z-index: 10;
+}
+
+.home-sidebar-inputs-location-options > div {
+  width: 100%;
+  border-bottom: 1px solid #cccccc;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 8px;
+  padding: 12px 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.home-sidebar-inputs-location-options > div:hover {
+  background-color: #00000009;
+  box-shadow: inset 0px 0px 4px #00000018;
+}
+
+.home-sidebar-inputs-location-options > div > span {
+  border-radius: 50%;
+  background-color: #0000001f;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .home-sidebar-selector-inputs {
@@ -174,7 +218,6 @@
   color: black;
   font-size: 16px;
 }
-
 
 /* ------------- Map.css ------------- */
 .home-map-container {

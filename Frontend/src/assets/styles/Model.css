@@ -31,6 +31,39 @@
   position: relative;
 }
 
+.modal-header-2 {
+  top: 0px;
+  position: sticky;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: black;
+  color: white;
+  border-radius: 10px 10px 0px 0px;
+}
+
+.modal-back-btn-2 {
+  background-color: white;
+  color: black;
+  border: 1px solid white;
+}
+
+.modal-back-btn-2:hover {
+  border: 1px solid white;
+}
+
+.modal-title {
+  flex: 1;
+  text-align: center;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.modal-body{
+  padding: 20px;
+}
+
 .modal-header h2 {
   font-size: 20px;
   margin-top: 18px;
@@ -140,4 +173,18 @@
   font-size: 16px;
   font-weight: bold;
   cursor: not-allowed;
+}
+
+
+.modal-body-container{
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.modal-body-container > img{
+  width: 60px;
+  height: 60px;
+  border: 1px solid black;
+  border-radius: 6px;
 }

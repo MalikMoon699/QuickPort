@@ -8,9 +8,11 @@ import UpdateUserDetails from "../components/UpdateUserDetails";
 import Sidebar from "../components/Sidebar";
 import Map from "../components/Map";
 import Bottom from "../components/Bottom";
+import Request from "../components/Request";
 
 const Rider = () => {
   const { userData } = useAuth();
+  const [isRequest, setIsRequest] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isProfileDetails, setIsProfileDetails] = useState(false);
   const [locationType, setLocationType] = useState(null);
@@ -68,6 +70,16 @@ const Rider = () => {
             endLocation={endLocation}
           />
         )}
+        <button
+          onClick={() => {
+            setIsRequest(true);
+          }}
+        >
+          open
+        </button>
+        {isRequest && 
+        <Request setIsRequest={setIsRequest} isRequest={isRequest}/>
+        }
       </div>
       {isProfileDetails && (
         <UpdateUserDetails setIsProfileDetails={setIsProfileDetails} />

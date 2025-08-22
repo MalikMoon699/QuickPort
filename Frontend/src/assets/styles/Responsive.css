@@ -25,7 +25,7 @@
     transition: all 0.3s ease-in-out;
   }
 
- .bottom-container {
+  .bottom-container {
     position: absolute;
     width: 100%;
     z-index: 10;
@@ -38,7 +38,7 @@
     width: 100%;
   }
 
-  .car-details{
+  .car-details {
     border-radius: 0px !important;
     border: none !important;
     border-bottom: 2px solid black !important;
@@ -48,12 +48,12 @@
     gap: 10px;
   }
 
-  .car-details > img{
+  .car-details > img {
     height: 270px;
     width: auto !important;
   }
 
-  .car-details > div{
+  .car-details > div {
     width: 100%;
   }
 }
@@ -70,8 +70,9 @@
     width: 100%;
   }
 
-  .signup-details-inputs > input, .signup-details-inputs > select{
-    margin-bottom:10px;
+  .signup-details-inputs > input,
+  .signup-details-inputs > select {
+    margin-bottom: 10px;
   }
 }
 

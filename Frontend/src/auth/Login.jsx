@@ -112,7 +112,11 @@ const Login = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
           <button
-            style={loading ? { backgroundColor: "#0000003d", cursor: "not-allowed" }:{}}
+            style={
+              loading
+                ? { backgroundColor: "#0000003d", cursor: "not-allowed" }
+                : {}
+            }
             className="btn btn-primary"
             onClick={handleLogin}
           >

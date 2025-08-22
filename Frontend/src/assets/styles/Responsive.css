@@ -3,12 +3,18 @@
     position: relative;
     flex-direction: column;
     align-items: center;
+    height: 86vh;
     gap: 0px;
     transition: all 0.3s ease-in-out;
+    overflow: hidden;
   }
 
   .home-sidebar-up-down-btn {
-    display: block;
+    display: flex;
+  }
+
+  .home-bottom-up-down-btn {
+    display: flex;
   }
 
   .home-sidebar-container {
@@ -19,7 +25,35 @@
     transition: all 0.3s ease-in-out;
   }
 
+ .bottom-container {
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+    height: 320px;
+    bottom: 0;
+    transition: all 0.3s ease-in-out;
+  }
+
   .home-map-container {
+    width: 100%;
+  }
+
+  .car-details{
+    border-radius: 0px !important;
+    border: none !important;
+    border-bottom: 2px solid black !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .car-details > img{
+    height: 270px;
+    width: auto !important;
+  }
+
+  .car-details > div{
     width: 100%;
   }
 }

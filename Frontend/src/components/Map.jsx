@@ -20,10 +20,24 @@ const Map = ({
   const [routeError, setRouteError] = useState("");
   const mapRef = useRef(null);
 
-  // Load Google Maps script
+  const createSvgIcon = (color, size) => {
+    return {
+      url:
+        "data:image/svg+xml;base64," +
+        btoa(`
+          <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+            <circle cx="${size / 2}" cy="${size / 2}" r="${
+          size / 2 - 1
+        }" fill="${color}" stroke="white" stroke-width="2"/>
+          </svg>
+        `),
+      scaledSize: new window.google.maps.Size(size, size),
+      anchor: new window.google.maps.Point(size / 2, size / 2),
+    };
+  };
+
   useEffect(() => {
     setLoading(true);
-
     loadGoogleMaps()
       .then(() => {
         if (!mapRef.current) return;
@@ -66,17 +80,14 @@ const Map = ({
       });
   }, []);
 
-  // Handle location selection on map click
   useEffect(() => {
     if (!map || !locationType) return;
 
     const handleMapClick = async (e) => {
       const geocoder = new window.google.maps.Geocoder();
-
       geocoder.geocode({ location: e.latLng }, async (results, status) => {
         if (status === "OK" && results[0]) {
           const address = results[0].formatted_address;
-
           try {
             switch (locationType) {
               case "start":
@@ -94,24 +105,20 @@ const Map = ({
           } catch (error) {
             console.error("Error setting location:", error);
           }
-
           setLocationType(null);
         }
       });
     };
 
-    if (locationType) {
-      mapRef.current.style.cursor = "crosshair";
+    mapRef.current.style.cursor = "crosshair";
+    const clickListener = map.addListener("click", handleMapClick);
 
-      const clickListener = map.addListener("click", handleMapClick);
-
-      return () => {
-        window.google.maps.event.removeListener(clickListener);
-        if (mapRef.current) {
-          mapRef.current.style.cursor = "";
-        }
-      };
-    }
+    return () => {
+      window.google.maps.event.removeListener(clickListener);
+      if (mapRef.current) {
+        mapRef.current.style.cursor = "";
+      }
+    };
   }, [
     map,
     locationType,
@@ -121,7 +128,6 @@ const Map = ({
     setLocationType,
   ]);
 
-  // Safe geocode function with error handling
   const safeGeocodeAddress = async (address, locationName) => {
     try {
       return await geocodeAddress(address);
@@ -135,15 +141,18 @@ const Map = ({
     }
   };
 
-  // Update markers when locations change
   useEffect(() => {
     if (!map || !window.google) return;
 
-    // Clear existing markers
     markers.forEach((marker) => marker.setMap(null));
     const newMarkers = [];
 
-    const createMarker = async (address, title, iconConfig) => {
+    const createMarker = async (
+      address,
+      title,
+      iconConfig,
+      shouldZoom = false
+    ) => {
       try {
         const geocoded = await safeGeocodeAddress(address, title);
         if (!geocoded) return null;
@@ -151,9 +160,15 @@ const Map = ({
         const marker = new window.google.maps.Marker({
           position: geocoded.location,
           map: map,
-          title: title,
+          title,
           icon: iconConfig,
         });
+
+         if (shouldZoom) {
+           map.setCenter(geocoded.location);
+           map.setZoom(15); 
+         }
+
         newMarkers.push(marker);
         return marker;
       } catch (error) {
@@ -163,131 +178,106 @@ const Map = ({
     };
 
     const createMarkers = async () => {
-      if (startLocation) {
-        await createMarker(startLocation, "Pickup Location", {
-          url:
-            "data:image/svg+xml;base64," +
-            btoa(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
-              <circle cx="10" cy="10" r="9" fill="#4F46E5" stroke="white" stroke-width="2"/>
-            </svg>
-          `),
-          scaledSize: new window.google.maps.Size(20, 20),
-          anchor: new window.google.maps.Point(10, 10),
-        });
-      }
+      const tasks = [];
 
-      if (endLocation) {
-        await createMarker(endLocation, "Dropoff Location", {
-          url:
-            "data:image/svg+xml;base64," +
-            btoa(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
-              <circle cx="10" cy="10" r="9" fill="#EF4444" stroke="white" stroke-width="2"/>
-            </svg>
-          `),
-          scaledSize: new window.google.maps.Size(20, 20),
-          anchor: new window.google.maps.Point(10, 10),
-        });
-      }
+      if (startLocation)
+        tasks.push(
+          createMarker(
+            startLocation,
+            "Pickup Location",
+            createSvgIcon("#4F46E5", 20),
+            true
+          )
+        );
+      if (endLocation)
+        tasks.push(
+          createMarker(
+            endLocation,
+            "Dropoff Location",
+            createSvgIcon("#EF4444", 20),
+            true
+          )
+        );
+      if (stopLocation)
+        tasks.push(
+          createMarker(
+            stopLocation,
+            "Stop Location",
+            createSvgIcon("#10B981", 16),
+            true
+          )
+        );
 
-      if (stopLocation) {
-        await createMarker(stopLocation, "Stop Location", {
-          url:
-            "data:image/svg+xml;base64," +
-            btoa(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-              <circle cx="8" cy="8" r="7" fill="#10B981" stroke="white" stroke-width="2"/>
-            </svg>
-          `),
-          scaledSize: new window.google.maps.Size(16, 16),
-          anchor: new window.google.maps.Point(8, 8),
-        });
-      }
-
-      setMarkers(newMarkers.filter((marker) => marker !== null));
+      const results = await Promise.all(tasks);
+      setMarkers(results.filter((m) => m !== null));
     };
 
     createMarkers();
   }, [map, startLocation, endLocation, stopLocation]);
 
-  // Calculate and display route when all locations are set
-  useEffect(() => {
+  const calculateRoute = async () => {
     if (
       !directionsService ||
       !directionsRenderer ||
       !startLocation ||
-      !endLocation ||
-      !window.google
-    ) {
-      setRouteError("");
+      !endLocation
+    )
       return;
-    }
 
-    const calculateRoute = async () => {
-      setRouteError("");
+    setRouteError("");
 
-      try {
-        // Geocode all addresses first to ensure they're valid
-        const [startGeocode, endGeocode, stopGeocode] = await Promise.all([
-          safeGeocodeAddress(startLocation, "start"),
-          safeGeocodeAddress(endLocation, "end"),
-          stopLocation
-            ? safeGeocodeAddress(stopLocation, "stop")
-            : Promise.resolve(null),
-        ]);
+    try {
+      const [startGeocode, endGeocode, stopGeocode] = await Promise.all([
+        safeGeocodeAddress(startLocation, "start"),
+        safeGeocodeAddress(endLocation, "end"),
+        stopLocation
+          ? safeGeocodeAddress(stopLocation, "stop")
+          : Promise.resolve(null),
+      ]);
 
-        // Check if any geocoding failed
-        if (!startGeocode || !endGeocode || (stopLocation && !stopGeocode)) {
-          setRouteError(
-            "Could not find one or more locations. Please check the addresses."
-          );
-          directionsRenderer.setDirections({ routes: [] });
-          return;
-        }
-
-        const waypoints = [];
-        if (stopGeocode) {
-          waypoints.push({
-            location: stopGeocode.location,
-            stopover: true,
-          });
-        }
-
-        directionsService.route(
-          {
-            origin: startGeocode.location,
-            destination: endGeocode.location,
-            waypoints: waypoints,
-            travelMode: window.google.maps.TravelMode.DRIVING,
-            provideRouteAlternatives: false,
-          },
-          (result, status) => {
-            if (status === "OK") {
-              directionsRenderer.setDirections(result);
-              setRouteError("");
-
-              // Adjust map bounds to show the entire route
-              const bounds = new window.google.maps.LatLngBounds();
-              result.routes[0].legs.forEach((leg) => {
-                bounds.extend(leg.start_location);
-                bounds.extend(leg.end_location);
-              });
-              map.fitBounds(bounds);
-            } else {
-              console.warn("Error calculating route:", status);
-              setRouteError(`Could not calculate route: ${status}`);
-              directionsRenderer.setDirections({ routes: [] });
-            }
-          }
+      if (!startGeocode || !endGeocode || (stopLocation && !stopGeocode)) {
+        setRouteError(
+          "Could not find one or more locations. Please check the addresses."
         );
-      } catch (error) {
-        console.error("Error in route calculation:", error);
-        setRouteError("Error calculating route. Please try again.");
         directionsRenderer.setDirections({ routes: [] });
+        return;
       }
-    };
 
+      const waypoints = stopGeocode
+        ? [{ location: stopGeocode.location, stopover: true }]
+        : [];
+
+      directionsService.route(
+        {
+          origin: startGeocode.location,
+          destination: endGeocode.location,
+          waypoints,
+          travelMode: window.google.maps.TravelMode.DRIVING,
+          provideRouteAlternatives: false,
+        },
+        (result, status) => {
+          if (status === "OK") {
+            directionsRenderer.setDirections(result);
+            const bounds = new window.google.maps.LatLngBounds();
+            result.routes[0].legs.forEach((leg) => {
+              bounds.extend(leg.start_location);
+              bounds.extend(leg.end_location);
+            });
+            map.fitBounds(bounds);
+          } else {
+            setRouteError(`Could not calculate route: ${status}`);
+            directionsRenderer.setDirections({ routes: [] });
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Error in route calculation:", error);
+      setRouteError("Error calculating route. Please try again.");
+      directionsRenderer.setDirections({ routes: [] });
+    }
+  };
+
+  useEffect(() => {
     calculateRoute();
   }, [
     directionsService,
@@ -302,7 +292,6 @@ const Map = ({
     <div className="home-map-container">
       {loading && <Loader loading={true} />}
       <div ref={mapRef} style={{ width: "100%", height: "100%" }} />
-
       {locationType && (
         <div className="map-selection-mode">
           <p>Click on the map to set {locationType} location</p>

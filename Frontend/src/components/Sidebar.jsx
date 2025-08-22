@@ -25,6 +25,7 @@ const Sidebar = ({
   setEndLocation,
   stopLocation,
   setStopLocation,
+  setIsSearching,
 }) => {
   const [isStopAdded, setIsStopAdded] = useState(false);
   const [isPickupTime, setIsPickupTime] = useState(false);
@@ -269,7 +270,7 @@ const Sidebar = ({
     const allValid = results.every((result) => result === true);
 
     setNav(false);
-
+    setIsSearching(true);
     if (allValid) {
       console.log("All addresses are valid, proceeding with search");
     } else {
@@ -469,6 +470,13 @@ const Sidebar = ({
           <div className="search-ride-btn">
             <button
               onClick={handleSearch}
+              disabled={
+                !(
+                  startLocation &&
+                  endLocation &&
+                  ((isStopAdded && stopLocation) || !isStopAdded)
+                )
+              }
               className={
                 startLocation &&
                 endLocation &&
@@ -480,6 +488,7 @@ const Sidebar = ({
               Search
             </button>
           </div>
+
           <button
             onClick={() => setNav((prev) => !prev)}
             style={

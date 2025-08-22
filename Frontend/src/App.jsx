@@ -1,6 +1,6 @@
 // Frontend/src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
-import Home from "./pages/Home";
+import Rider from "./pages/Rider";
 import Login from "./auth/Login";
 import SignUp from "./auth/SignUp";
 import SignupDetails from "./components/SignupDetails";
@@ -9,9 +9,10 @@ import "./assets/styles/App.css";
 import "./assets/styles/Model.css";
 import "./assets/styles/Responsive.css";
 import Loader from "./components/Loader";
+import Driver from "./pages/Driver";
 
 const App = () => {
-  const { authAllow, loading, isDetail } = useAuth();
+  const { authAllow, loading, isDetail, userData } = useAuth();
 
   return (
     <>
@@ -22,7 +23,10 @@ const App = () => {
           {authAllow ? (
             isDetail ? (
               <>
-                <Route path="/" element={<Home />} />
+                <Route
+                  path="/"
+                  element={userData.role === "rider" ? <Rider /> : <Driver />}
+                />
                 <Route path="/signup-details" element={<SignupDetails />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </>

@@ -1,0 +1,124 @@
+.fade-in-left {
+  opacity: 0;
+  transform: translateX(-50px);
+  animation: fadeInLeft 0.8s ease forwards;
+}
+
+@keyframes fadeInLeft {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bottom-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 320px;
+  min-height: 335px;
+  background-color: white;
+  padding: 20px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px #0000001f;
+}
+
+.bottom-inner-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+.searching-loader-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.searching-loader-container > h1 {
+  position: absolute;
+  color: black;
+  background-color: white;
+  font-size: 10px;
+  padding: 32px 11px;
+  border-radius: 50%;
+}
+
+.home-bottom-up-down-btn {
+  display: none;
+  position: absolute;
+  top: -31px;
+  right: 25px;
+  width: 20px;
+  height: 44px;
+  transform: rotate(-90deg);
+  background-color: #ffffff;
+  border: none;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cccccc;
+  border-left: 0px;
+  border-radius: 0px 8px 8px 0px;
+  cursor: pointer;
+}
+
+.location-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+}
+
+.location-container > span {
+  background-color: rgb(255 254 254);
+  padding: 11px 8px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px #00000024;
+}
+
+.ellipsis {
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.ellipsis-change {
+  display: none;
+  background-color: #00000073;
+  color: white;
+  position: absolute;
+  top: -5px;
+  right: 0;
+  transform: rotate(-90deg);
+  padding: 10px;
+  border-radius: 30px 0px 0px 0px;
+}
+
+.ellipsis:hover .ellipsis-change {
+  display: block;
+}

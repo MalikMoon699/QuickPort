@@ -36,7 +36,11 @@ const UpdateUserDetails = ({ setIsProfileDetails }) => {
           <span>QuickPort Cash</span>
           <span>PKR 0.00</span>
         </div>
-        <div onClick={() => {navigate("/signup-details")}}>
+        <div
+          onClick={() =>
+            navigate("/signup-details", { state: { update: "true" } })
+          }
+        >
           <UserRound fill="black" size={20} /> Manage Account
         </div>
         <div>

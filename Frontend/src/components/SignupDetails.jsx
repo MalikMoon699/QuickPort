@@ -4,17 +4,19 @@ import { useAuth } from "../context/AuthContext";
 import "../assets/styles/SignupDetails.css";
 import { Placeholder } from "../assets/images/Images";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 const SignupDetails = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const update = location.state?.update || "false";
   const { userData, logout, setUserData } = useAuth();
   const fileInputRef = useRef(null);
   const [profileImg, setProfileImg] = useState(userData?.profileImg || "");
   const [firstName, setFirstName] = useState(userData?.firstName || "");
   const [lastName, setLastName] = useState(userData?.lastName || "");
   const [phoneNumber, setPhoneNumber] = useState(userData?.phoneNumber || "");
-  const [cnicNumber, setCNICNumber] = useState(userData?.cnicNumber || "");
+  const [cnicNumber, setCNICNumber] = useState(userData?.CNIC || "");
   const [gender, setGender] = useState(userData?.gender || "Gender");
   const [rideType, setRideType] = useState(userData?.rideType || "RideType");
   const [rideNumber, setRideNumber] = useState(userData?.rideNumber || "");
@@ -22,9 +24,8 @@ const SignupDetails = () => {
   const [loading, setLoading] = useState(false);
 
   const handleImageClick = () => {
-    fileInputRef.current.click(); 
+    fileInputRef.current.click();
   };
-
 
   const validation = () => {
     if (!firstName || !lastName || !phoneNumber) {
@@ -45,61 +46,60 @@ const SignupDetails = () => {
     return true;
   };
 
-const handleSave = async () => {
-  if (!validation()) return;
-  setLoading(true);
+  const handleSave = async () => {
+    if (!validation()) return;
+    setLoading(true);
 
-  try {
-    const formData = new FormData();
-    formData.append("firstName", firstName);
-    formData.append("lastName", lastName);
-    formData.append("phoneNumber", phoneNumber);
-    formData.append("cnicNumber", cnicNumber);
-    formData.append("gender", gender);
-    formData.append("rideType", rideType);
-    formData.append("rideNumber", rideNumber);
-    formData.append("rideBrand", rideBrand);
-    if (profileImg instanceof File) {
-      formData.append("profileImg", profileImg);
-    }
-
-    const token = localStorage.getItem("token");
-    const res = await fetch(
-      `${import.meta.env.VITE_BACKEND_URL}/api/auth/update`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
+    try {
+      const formData = new FormData();
+      formData.append("firstName", firstName);
+      formData.append("lastName", lastName);
+      formData.append("phoneNumber", phoneNumber);
+      formData.append("cnicNumber", cnicNumber);
+      formData.append("gender", gender);
+      formData.append("rideType", rideType);
+      formData.append("rideNumber", rideNumber);
+      formData.append("rideBrand", rideBrand);
+      if (profileImg instanceof File) {
+        formData.append("profileImg", profileImg);
       }
-    );
 
-    if (!res.ok) {
-      throw new Error("Failed to update profile");
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/update`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      const data = await res.json();
+      toast.success("Profile updated successfully!");
+      setUserData((prev) => ({ ...prev, ...data.user }));
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update profile");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const data = await res.json();
-    toast.success("Profile updated successfully!");
-    setUserData((prev) => ({ ...prev, ...data.user }));
-    navigate("/");
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to update profile");
-  } finally {
-    setLoading(false);
-  }
-};
-
-const handleFileChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    setProfileImg(file);
-    const previewUrl = URL.createObjectURL(file);
-    setProfileImg(previewUrl);
-  }
-};
-
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImg(file);
+      const previewUrl = URL.createObjectURL(file);
+      setProfileImg(previewUrl);
+    }
+  };
 
   return (
     <div className="signup-details-container">
@@ -239,7 +239,16 @@ const handleFileChange = (e) => {
         </>
       )}
       <div className="signup-details-btn-container">
-        <button onClick={logout}>Logout</button>
+        {update === "true" ? (
+          <button
+            style={{ background: "rgb(84 84 84 / 27%)" }}
+            onClick={() => navigate("/")}
+          >
+            Cancel
+          </button>
+        ) : (
+          <button onClick={logout}>Logout</button>
+        )}
         <button onClick={handleSave} disabled={loading}>
           {loading ? "Saving..." : "Save"}
         </button>

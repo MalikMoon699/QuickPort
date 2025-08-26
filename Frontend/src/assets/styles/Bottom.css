@@ -135,7 +135,7 @@
 }
 
 .ellipsis-change {
-  display: none;
+  /* display: none; */
   background-color: #00000073;
   color: white;
   position: absolute;

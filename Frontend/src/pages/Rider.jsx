@@ -77,9 +77,9 @@ const Rider = () => {
         >
           open
         </button>
-        {isRequest && 
-        <Request setIsRequest={setIsRequest} isRequest={isRequest}/>
-        }
+        {isRequest && (
+          <Request setIsRequest={setIsRequest} isRequest={isRequest} />
+        )}
       </div>
       {isProfileDetails && (
         <UpdateUserDetails setIsProfileDetails={setIsProfileDetails} />

@@ -13,8 +13,8 @@ const Request = ({ setIsRequest }) => {
       _id: "68a763cb8ee80c6fde04d379",
       email: "malikmoon.developer061@gmail.com",
       profileImg: "",
-      firstName: "Mujtaba",
-      lastName: "Malik",
+      firstName: "Moon",
+      lastName: "Awan",
       phoneNumber: "03123456789",
       gender: "Male",
       role: "rider",
@@ -38,16 +38,19 @@ const Request = ({ setIsRequest }) => {
       createdAt: "2025-08-20T14:03:30.145+00:00",
       updatedAt: "2025-08-22T12:56:56.100+00:00",
     },
-    locations: {
-      start:
-        "697, Umer Block Umar Block Allama Iqbal Town, Lahore, 54000, Pakistan",
-      stop: "Ichra Rd, Ichhra Shah Din Scheme Lahore, 54000, Pakistan",
-      end: "2 Gulberg Rd, Millat Colony, Lahore, 54600, Pakistan",
-      totalDistance: "4km",
-      riderlocation:
-        "697, Umer Block Umar Block Allama Iqbal Town, Lahore, 54000, Pakistan",
-      driverlocation:
-        "Shop #02 Fazal e Haq Rd, Ravi Block Allama Iqbal Town, Lahore, Pakistan",
+    rideDetails: {
+      locations: {
+        start:
+          "697, Umer Block Umar Block Allama Iqbal Town, Lahore, 54000, Pakistan",
+        stop: "Ichra Rd, Ichhra Shah Din Scheme Lahore, 54000, Pakistan",
+        end: "2 Gulberg Rd, Millat Colony, Lahore, 54600, Pakistan",
+        totalDistance: "4km",
+        riderlocation:
+          "697, Umer Block Umar Block Allama Iqbal Town, Lahore, 54000, Pakistan",
+        driverlocation:
+          "Shop #02 Fazal e Haq Rd, Ravi Block Allama Iqbal Town, Lahore, Pakistan",
+      },
+      Time: "now",
     },
     price: "350",
     driverStatus: "pending",
@@ -121,7 +124,7 @@ const Request = ({ setIsRequest }) => {
         <div className="request-details2">
           <p>
             <strong>Total Distance:</strong>{" "}
-            {rideData?.locations?.totalDistance}
+            {rideData?.rideDetails?.locations?.totalDistance}
           </p>
           <h2>
             Price: {rideData?.price}
@@ -159,7 +162,7 @@ const Request = ({ setIsRequest }) => {
               <p className="modal-title">Request Details</p>
             </div>
             <div className="modal-body">
-              <div className="modal-body-container">
+              <div className="modal-body-user-container">
                 <img
                   src={rideData?.driverData?.profileImg || Placeholder}
                   alt=""
@@ -173,13 +176,13 @@ const Request = ({ setIsRequest }) => {
                   <p>{rideData?.driverData?.email}</p>
                 </div>
               </div>
-              <div className="modal-body-container">
+              <div className="modal-body-driver-rideinfo-container">
                 <img
                   style={{
                     // border:"none",
                     margin:
                       rideData?.driverData?.rideType === "Car"
-                        ? "-35px 0px 0px 0px"
+                        ? "0px 0px 0px 0px"
                         : rideData?.driverData?.rideType === "Bike"
                         ? "-10px 0px -15px 0px"
                         : "-10px 0px -15px 0px",
@@ -195,24 +198,42 @@ const Request = ({ setIsRequest }) => {
                 />
                 <div>
                   <p>
+                    <strong>Ride:</strong> {rideData?.driverData?.rideBrand}
+                  </p>
+                  <p>
+                    {" "}
+                    <strong>Ride Time:</strong> {rideData?.rideDetails?.Time}
+                  </p>
+                  <p>
                     {" "}
                     <strong>Ride Number:</strong>{" "}
                     {rideData?.driverData?.rideNumber}
                   </p>
-                  <p>
-                    <strong>Ride:</strong> {rideData?.driverData?.rideBrand}
-                  </p>
                 </div>
               </div>
               <div
-                className="modal-body-container"
-                style={{ flexDirection: "column" }}
+                className="modal-body-location-container"
               >
-                <p>Rider location: {rideData?.locations?.riderlocation}</p>
-                <p>Start location: {rideData?.locations?.start}</p>
-                <p>Stop location: {rideData?.locations?.stop}</p>
-                <p>End location: {rideData?.locations?.riderlocation}</p>
-                <p>Total Distance: {rideData?.locations?.totalDistance}</p>
+                <p>
+                  <strong> Rider location:</strong>
+                  {rideData?.rideDetails?.locations?.riderlocation}
+                </p>
+                <p>
+                  <strong>Start location:</strong>
+                  {rideData?.rideDetails?.locations?.start}
+                </p>
+                <p>
+                  <strong> Stop location:</strong>
+                  {rideData?.rideDetails?.locations?.stop}
+                </p>
+                <p>
+                  <strong>End location:</strong>
+                  {rideData?.rideDetails?.locations?.riderlocation}
+                </p>
+                <p>
+                  <strong>Total Distance:</strong>
+                  {rideData?.rideDetails?.locations?.totalDistance}
+                </p>
               </div>
               <div className="request-action">
                 <button onClick={handleReject}>Reject</button>

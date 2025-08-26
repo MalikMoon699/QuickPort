@@ -107,3 +107,55 @@
 .request-action > button:nth-child(2):hover {
   background-color: #31d73194;
 }
+
+.price-consolution {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.price-consolution > div {
+  border: 1px solid black;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.price-consolution > div > span {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.price-consolution > div > input {
+  outline: none;
+  border: none;
+  max-width: 60px;
+  padding: 8px 12px;
+  font-size: 16px;
+  text-align: center;
+  color: black;
+}
+
+.price-consolution > div > span:nth-child(1) {
+  border-right: 1px solid black;
+}
+
+.price-consolution > div > span:nth-child(3) {
+  border-left: 1px solid black;
+}
+
+.modal-body-location-container {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 0px;
+}
+
+.modal-body-location-container > p {
+  border: 1px solid black;
+  border-radius: 8px;
+  padding: 8px 6px;
+  background: #0000001a;
+  width: 100%;
+}

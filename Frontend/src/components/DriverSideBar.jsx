@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../assets/styles/DriverSideBar.css";
 import { Auto, Car, Bike, Placeholder } from "../assets/images/Images";
 import { useAuth } from "../context/AuthContext";
@@ -12,9 +12,6 @@ const DriverSideBar = ({
 }) => {
   const { userData } = useAuth();
   const [nav, setNav] = useState(true);
-  // const [isAvailable, setIsAvailable] = useState(
-  //   JSON.parse(localStorage.getItem("isAvailable")) || false
-  // );
   const [validationErrors, setValidationErrors] = useState({
     start: "",
     end: "",
@@ -37,38 +34,37 @@ const DriverSideBar = ({
 
   const handleUseCurrentLocation = () => {
     if (navigator.geolocation) {
-     navigator.geolocation.getCurrentPosition(
-       async (position) => {
-         const { latitude, longitude } = position.coords;
-         try {
-           const res = await fetch(
-             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${
-               import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-             }`
-           );
-           const data = await res.json();
-           if (data.results.length > 0) {
-             setStartLocation(data.results[0].formatted_address);
-             await validateAddress(data.results[0].formatted_address, "start");
-           }
-           setLocationType("start");
-         } catch (err) {
-           console.error("Geocode error:", err);
-         }
-       },
-       (error) => {
-         if (error.code === error.PERMISSION_DENIED) {
-           alert("Location permission denied. Please enable location access.");
-         } else if (error.code === error.POSITION_UNAVAILABLE) {
-           alert("Location information is unavailable.");
-         } else if (error.code === error.TIMEOUT) {
-           alert("The request to get user location timed out.");
-         } else {
-           alert("An unknown error occurred while fetching location.");
-         }
-       }
-     );
-
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const res = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${
+                import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+              }`
+            );
+            const data = await res.json();
+            if (data.results.length > 0) {
+              setStartLocation(data.results[0].formatted_address);
+              await validateAddress(data.results[0].formatted_address, "start");
+            }
+            setLocationType("start");
+          } catch (err) {
+            console.error("Geocode error:", err);
+          }
+        },
+        (error) => {
+          if (error.code === error.PERMISSION_DENIED) {
+            alert("Location permission denied. Please enable location access.");
+          } else if (error.code === error.POSITION_UNAVAILABLE) {
+            alert("Location information is unavailable.");
+          } else if (error.code === error.TIMEOUT) {
+            alert("The request to get user location timed out.");
+          } else {
+            alert("An unknown error occurred while fetching location.");
+          }
+        }
+      );
     } else {
       alert("Geolocation is not supported by this browser.");
     }

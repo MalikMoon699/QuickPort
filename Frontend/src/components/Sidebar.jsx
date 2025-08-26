@@ -16,6 +16,7 @@ import {
   geocodeAddress,
   getPlaceDetails,
 } from "../utils/googleMaps";
+import { toast } from "react-toastify";
 
 const Sidebar = ({
   setLocationType,
@@ -121,6 +122,9 @@ const Sidebar = ({
         },
         (error) => {
           console.error("Error getting location:", error);
+          toast.error(
+            "Permision denied location, please Allow location permission"
+          );
         }
       );
     } else {
@@ -355,6 +359,7 @@ const Sidebar = ({
                 onBlur={handleStopLocationBlur}
               />
               <Trash2
+                style={{ cursor: "pointer" }}
                 onClick={() => {
                   setIsStopAdded(false);
                   setStopLocation("");
@@ -413,6 +418,7 @@ const Sidebar = ({
               <CirclePlus
                 onClick={() => setIsStopAdded(true)}
                 size={35}
+                style={{ cursor: "pointer" }}
                 fill="black"
                 color="white"
               />

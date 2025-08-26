@@ -42,6 +42,10 @@ const Bottom = ({
                 EllipsisFunction("start");
               }}
               className="ellipsis-change"
+              style={{
+                transform: ellipsis === "start" ? "rotate(90deg)" : "",
+                borderRadius: ellipsis === "start" ? "0px 0px 30px 0px" : "",
+              }}
             >
               ❮
             </span>
@@ -58,6 +62,10 @@ const Bottom = ({
                   EllipsisFunction("stop");
                 }}
                 className="ellipsis-change"
+                style={{
+                  transform: ellipsis === "stop" ? "rotate(90deg)" : "",
+                  borderRadius: ellipsis === "stop" ? "0px 0px 30px 0px" : "",
+                }}
               >
                 ❮
               </span>
@@ -74,6 +82,10 @@ const Bottom = ({
                 EllipsisFunction("end");
               }}
               className="ellipsis-change"
+              style={{
+                transform: ellipsis === "end" ? "rotate(90deg)" : "",
+                borderRadius: ellipsis === "end" ? "0px 0px 30px 0px" : "",
+              }}
             >
               ❮
             </span>

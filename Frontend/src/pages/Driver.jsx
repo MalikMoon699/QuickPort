@@ -8,9 +8,11 @@ import UpdateUserDetails from "../components/UpdateUserDetails";
 import Map from "../components/Map";
 import DriverSideBar from "../components/DriverSideBar";
 import DriverBottom from "../components/DriverBottom";
+import DriverRequest from "../components/DriverRequest";
 
 const Driver = () => {
   const { userData } = useAuth();
+  const [isRequest, setIsRequest] = useState(false);
   const [searching, setSearching] = useState(false);
   const [isProfileDetails, setIsProfileDetails] = useState(false);
   const [locationType, setLocationType] = useState(null);
@@ -25,11 +27,6 @@ useEffect(() => {
   localStorage.setItem("isAvailable", JSON.stringify(isAvailable));
 }, [isAvailable]);
 
-// if(location){
-//   alert("Location permision denied please enable location permision");
-// }
-
-console.log(isAvailable);
   return (
     <div className="home-container">
       <div className="auth-header">
@@ -83,6 +80,16 @@ console.log(isAvailable);
           />
         )}
       </div>
+      <button
+        onClick={() => {
+          setIsRequest(true);
+        }}
+      >
+        open
+      </button>
+      {isAvailable && isRequest && (
+        <DriverRequest setIsRequest={setIsRequest} isRequest={isRequest} />
+      )}
       {isProfileDetails && (
         <UpdateUserDetails setIsProfileDetails={setIsProfileDetails} />
       )}

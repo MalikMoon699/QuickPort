@@ -17,6 +17,7 @@ const driverSchema = new mongoose.Schema(
     rideType: { type: String, default: "" },
     rideNumber: { type: String, default: "" },
     rideBrand: { type: String, default: "" },
+    isAvailable: { type: Boolean, default: false },
     otp: { type: String },
     otpExpires: { type: Date },
     role: { type: String, default: "driver" },

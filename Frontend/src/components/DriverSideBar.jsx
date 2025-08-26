@@ -1,3 +1,4 @@
+// Frontend/src/components/DriverSideBar.jsx
 import React, { useState, useEffect } from "react";
 import "../assets/styles/DriverSideBar.css";
 import { Auto, Car, Bike, Placeholder } from "../assets/images/Images";
@@ -70,23 +71,49 @@ const DriverSideBar = ({
     }
   };
 
-  const StartRide = () => {
-    handleUseCurrentLocation();
-    localStorage.setItem("isAvailable", JSON.stringify(true));
-    setIsAvailable(true);
-    setStartLocation();
-    setNav(false);
-    setSearching(true);
-  };
+const updateDriverAvailability = async (available) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/driver/availability`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isAvailable: available }),
+      }
+    );
 
-  const StopRide = () => {
-    setStartLocation(null);
-    localStorage.setItem("isAvailable", JSON.stringify(false));
-    setIsAvailable(false);
-    setNav(false);
-    setStartLocation(null);
-    setSearching(false);
-  };
+    if (response.ok) {
+      console.log("Availability updated successfully");
+    } else {
+      console.error("Failed to update availability");
+    }
+  } catch (error) {
+    console.error("Error updating availability:", error);
+  }
+};
+
+const StartRide = () => {
+  handleUseCurrentLocation();
+  localStorage.setItem("isAvailable", JSON.stringify(true));
+  setIsAvailable(true);
+  updateDriverAvailability(true); // Sync with backend
+  setNav(false);
+  setSearching(true);
+};
+
+const StopRide = () => {
+  setStartLocation(null);
+  localStorage.setItem("isAvailable", JSON.stringify(false));
+  setIsAvailable(false);
+  updateDriverAvailability(false); // Sync with backend
+  setNav(false);
+  setStartLocation(null);
+  setSearching(false);
+};
 
   return (
     <>

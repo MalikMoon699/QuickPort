@@ -1,3 +1,4 @@
+// Frontend/src/components/Request.jsx
 import React, { useState } from "react";
 import "../assets/styles/Request.css";
 import { Placeholder, Car, Bike, Auto } from "../assets/images/Images";
@@ -211,9 +212,7 @@ const Request = ({ setIsRequest }) => {
                   </p>
                 </div>
               </div>
-              <div
-                className="modal-body-location-container"
-              >
+              <div className="modal-body-location-container">
                 <p>
                   <strong> Rider location:</strong>
                   {rideData?.rideDetails?.locations?.riderlocation}

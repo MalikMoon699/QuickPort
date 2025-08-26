@@ -1,3 +1,4 @@
+// Frontend/src/components/Sidebar.jsx
 import React, { useState, useEffect, useRef } from "react";
 import {
   CalendarDays,
@@ -17,13 +18,17 @@ import {
   getPlaceDetails,
 } from "../utils/googleMaps";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 const Sidebar = ({
+  setPickupTime,
+  pickupTime,
   setLocationType,
   startLocation,
   setStartLocation,
   endLocation,
   setEndLocation,
+  handleSearch,
   stopLocation,
   setStopLocation,
   setIsSearching,
@@ -31,7 +36,6 @@ const Sidebar = ({
   const [isStopAdded, setIsStopAdded] = useState(false);
   const [isPickupTime, setIsPickupTime] = useState(false);
   const [nav, setNav] = useState(true);
-  const [pickupTime, setPickupTime] = useState("now");
   const [pickupDate, setPickupDate] = useState("Today");
   const [pickupSelection, setPickupSelection] = useState("");
   const [pickupSelectionModel, setPickupSelectionModel] = useState(false);
@@ -42,7 +46,7 @@ const Sidebar = ({
     stop: "",
   });
   const containerRef = useRef(null);
-
+  const { userData } = useAuth();
   const [startSuggestions, setStartSuggestions] = useState([]);
   const [endSuggestions, setEndSuggestions] = useState([]);
   const [stopSuggestions, setStopSuggestions] = useState([]);
@@ -255,17 +259,15 @@ const Sidebar = ({
     }
   };
 
-  const handleSearch = async () => {
+  const handleSearching = async () => {
     const validations = [];
 
     if (startLocation) {
       validations.push(validateAddress(startLocation, "start"));
     }
-
     if (endLocation) {
       validations.push(validateAddress(endLocation, "end"));
     }
-
     if (stopLocation && isStopAdded) {
       validations.push(validateAddress(stopLocation, "stop"));
     }
@@ -273,10 +275,11 @@ const Sidebar = ({
     const results = await Promise.all(validations);
     const allValid = results.every((result) => result === true);
 
-    setNav(false);
-    setIsSearching(true);
     if (allValid) {
       console.log("All addresses are valid, proceeding with search");
+      await handleSearch();
+      setNav(false);
+      setIsSearching(true);
     } else {
       console.log("Please fix invalid addresses");
     }
@@ -475,7 +478,7 @@ const Sidebar = ({
 
           <div className="search-ride-btn">
             <button
-              onClick={handleSearch}
+              onClick={handleSearching}
               disabled={
                 !(
                   startLocation &&

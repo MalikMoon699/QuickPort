@@ -1,9 +1,14 @@
+// Frontend/src/components/DriverRequest.jsx
 import React, { useState } from "react";
 import "../assets/styles/Request.css";
-import { Placeholder, Car, Bike, Auto } from "../assets/images/Images";
+import { Placeholder} from "../assets/images/Images";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
+import { useSocket } from "../context/SocketContext";
 
-const DriverRequest = ({ setIsRequest }) => {
+const DriverRequest = ({ setIsRequest ,incomingRide}) => {
+   const { userData } = useAuth();
+   const socket = useSocket();
   const [isVisible, setIsVisible] = useState(true);
   const [isDetailModel, setIsDetailModel] = useState(false);
   const [ridePrice, setRidePrice] = useState(350);
@@ -68,9 +73,17 @@ const DriverRequest = ({ setIsRequest }) => {
     handleClose();
     toast.success("Ride rejected");
   };
+ 
   const handleAccept = () => {
+    if (socket && incomingRide) {
+      socket.emit(
+        "accept-ride",
+        incomingRide._id,
+        userData,
+        ridePrice.toString()
+      );
+    }
     handleClose();
-    toast.success("Ride accepted");
   };
 
   const handleIncrease = () => {

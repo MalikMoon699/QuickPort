@@ -1,7 +1,7 @@
 // Frontend/src/pages/Driver.jsx
-
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useSocket } from "../context/SocketContext";
 import { Placeholder, WhiteLogo } from "../assets/images/Images";
 import "../assets/styles/Home.css";
 import UpdateUserDetails from "../components/UpdateUserDetails";
@@ -12,6 +12,8 @@ import DriverRequest from "../components/DriverRequest";
 
 const Driver = () => {
   const { userData } = useAuth();
+   const socket = useSocket();
+   const [incomingRide, setIncomingRide] = useState(null);
   const [isRequest, setIsRequest] = useState(false);
   const [searching, setSearching] = useState(false);
   const [isProfileDetails, setIsProfileDetails] = useState(false);
@@ -19,13 +21,39 @@ const Driver = () => {
   const [startLocation, setStartLocation] = useState("");
   const [endLocation, setEndLocation] = useState("");
   const [stopLocation, setStopLocation] = useState("");
-const [isAvailable, setIsAvailable] = useState(
-  JSON.parse(localStorage.getItem("isAvailable")) || false
-);
+  const [isAvailable, setIsAvailable] = useState(
+    JSON.parse(localStorage.getItem("isAvailable")) || false
+  );
 
-useEffect(() => {
-  localStorage.setItem("isAvailable", JSON.stringify(isAvailable));
-}, [isAvailable]);
+    useEffect(() => {
+      if (socket) {
+        socket.on("new-ride-request", (rideData) => {
+          console.log("New ride request", rideData);
+          setIncomingRide(rideData);
+          setIsRequest(true); // Show the request modal
+        });
+
+        socket.on("ride-acceptance-confirmed", (rideData) => {
+          console.log("Ride acceptance confirmed", rideData);
+          // Handle successful acceptance (e.g., navigate to navigation screen)
+        });
+
+        socket.on("ride-acceptance-error", (error) => {
+          console.error("Ride acceptance failed", error);
+          // Show error to driver
+        });
+
+        return () => {
+          socket.off("new-ride-request");
+          socket.off("ride-acceptance-confirmed");
+          socket.off("ride-acceptance-error");
+        };
+      }
+    }, [socket]);
+
+  useEffect(() => {
+    localStorage.setItem("isAvailable", JSON.stringify(isAvailable));
+  }, [isAvailable]);
 
   return (
     <div className="home-container">
@@ -80,15 +108,12 @@ useEffect(() => {
           />
         )}
       </div>
-      <button
-        onClick={() => {
-          setIsRequest(true);
-        }}
-      >
-        open
-      </button>
       {isAvailable && isRequest && (
-        <DriverRequest setIsRequest={setIsRequest} isRequest={isRequest} />
+        <DriverRequest
+          setIsRequest={setIsRequest}
+          isRequest={isRequest}
+          incomingRide={incomingRide}
+        />
       )}
       {isProfileDetails && (
         <UpdateUserDetails setIsProfileDetails={setIsProfileDetails} />

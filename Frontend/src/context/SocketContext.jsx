@@ -14,26 +14,20 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (userData) {
-      const backendUrl =
-        import.meta.env.VITE_BACKEND_URL ||
-        "https://quick-port-backend.vercel.app";
-      const newSocket = io(backendUrl, {
-        transports: ["websocket", "polling"], // Try WebSocket first, fallback to polling
-        withCredentials: true,
-      });
+      const newSocket = io(
+        import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"
+      );
 
       newSocket.on("connect", () => {
         console.log("Connected to server with ID:", newSocket.id);
+        // Join room based on user role and ID
         if (userData.role === "driver") {
+          // Also emit driver availability when connecting
           newSocket.emit("join-room", userData._id, userData.role);
           console.log("Driver joined room:", `driver-${userData._id}`);
         } else {
           newSocket.emit("join-room", userData._id, userData.role);
         }
-      });
-
-      newSocket.on("connect_error", (error) => {
-        console.error("Socket.IO connection error:", error);
       });
 
       setSocket(newSocket);

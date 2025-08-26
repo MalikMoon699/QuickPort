@@ -1,6 +1,5 @@
+// Backend/src/server.js
 import express from "express";
-import { createServer } from "http";
-import { Server } from "socket.io";
 import { connectDB } from "./Config/db.js";
 import path from "path";
 import bodyParser from "body-parser";
@@ -9,16 +8,22 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import cors from "cors";
 import dotenv from "dotenv";
-import driverRoutes from "./Routes/Driver.routes.js";
+import http from "http";
+import { Server } from "socket.io";
 import Ride from "./Models/Ride_Models.js";
+import driverRoutes from "./Routes/Driver.routes.js";
 
 dotenv.config();
+
+const port = process.env.PORT || 3000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const server = createServer(app);
+const server = http.createServer(app);
+
+// Socket.IO setup with CORS configuration
 const io = new Server(server, {
   cors: {
     origin: ["http://localhost:5173", "https://quick-port-gules.vercel.app"],
@@ -36,8 +41,10 @@ app.use(
 );
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(express.static(path.join(__dirname, "Public")));
 const uploadsDir = path.join(__dirname, "Public", "Uploads");
+
 app.use("/Uploads", express.static(uploadsDir));
 
 app.get("/", (req, res) => {
@@ -54,6 +61,7 @@ io.on("connection", (socket) => {
       console.error("Invalid join-room parameters:", { userId, role });
       return;
     }
+    
     socket.join(`${role}-${userId}`);
     console.log(`User ${userId} joined room as ${role}`);
   });
@@ -61,9 +69,12 @@ io.on("connection", (socket) => {
   socket.on("ride-request", async (rideData) => {
     try {
       console.log("Received ride request:", rideData);
+
+      // Validate required fields
       if (!rideData.riderData || !rideData.riderData._id) {
         throw new Error("Invalid rider data");
       }
+
       if (
         !rideData.rideDetails ||
         !rideData.rideDetails.locations ||
@@ -71,14 +82,23 @@ io.on("connection", (socket) => {
       ) {
         throw new Error("Invalid ride details");
       }
+
+      // Save ride request to database
       const newRide = new Ride(rideData);
       await newRide.save();
+
       console.log("Ride saved to database:", newRide);
+
+      // Find available drivers (you'll need to implement this logic)
       const availableDrivers = await findAvailableDrivers();
       console.log("Available drivers:", availableDrivers.length);
+
+      // Emit ride request to available drivers
       availableDrivers.forEach((driver) => {
         io.to(`driver-${driver._id}`).emit("new-ride-request", newRide);
       });
+
+      // Send confirmation to rider
       io.to(`rider-${rideData.riderData._id}`).emit(
         "ride-request-sent",
         newRide
@@ -92,18 +112,29 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Handle driver accepting ride
   socket.on("accept-ride", async (rideId, driverData, price) => {
     try {
       console.log("Driver accepting ride:", rideId, driverData, price);
+
+      // Update ride with driver data and price
       const updatedRide = await Ride.findByIdAndUpdate(
         rideId,
-        { driverData, price, driverStatus: "accepted" },
+        {
+          driverData: driverData,
+          price: price,
+          driverStatus: "accepted",
+        },
         { new: true }
       );
+
+      // Notify rider that driver accepted
       io.to(`rider-${updatedRide.riderData._id}`).emit(
         "ride-accepted",
         updatedRide
       );
+
+      // Notify driver that acceptance was successful
       io.to(`driver-${driverData._id}`).emit(
         "ride-acceptance-confirmed",
         updatedRide
@@ -117,8 +148,12 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Handle ride rejection
   socket.on("reject-ride", (rideId, driverId) => {
     console.log("Driver rejecting ride:", rideId, driverId);
+
+    // Notify rider that driver rejected
+    // You might want to update the ride status in the database
     io.to(`rider-${rideId}`).emit("ride-rejected", driverId);
   });
 
@@ -130,7 +165,11 @@ io.on("connection", (socket) => {
 async function findAvailableDrivers() {
   try {
     const Driver = (await import("./Models/Driver_Models.js")).default;
-    const availableDrivers = await Driver.find({ isAvailable: true });
+
+    const availableDrivers = await Driver.find({
+      isAvailable: true,
+    });
+
     console.log("Available drivers:", availableDrivers.length);
     return availableDrivers;
   } catch (error) {
@@ -139,8 +178,10 @@ async function findAvailableDrivers() {
   }
 }
 
-// Export for Vercel serverless function
-export default async (req, res) => {
-  // Attach the Socket.IO server to Vercel's serverless response
-  server.emit("request", req, res);
-};
+if (process.env.NODE_ENV !== "production") {
+  server.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+}
+
+export default app;

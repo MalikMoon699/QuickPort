@@ -61,7 +61,7 @@ io.on("connection", (socket) => {
       console.error("Invalid join-room parameters:", { userId, role });
       return;
     }
-
+    
     socket.join(`${role}-${userId}`);
     console.log(`User ${userId} joined room as ${role}`);
   });

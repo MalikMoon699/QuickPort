@@ -1,4 +1,12 @@
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import { useAuth } from "./AuthContext";
+
+const SocketContext = createContext();
+
+export const useSocket = () => {
+  return useContext(SocketContext);
+};
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
@@ -6,30 +14,20 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (userData) {
-      // For Vercel deployment
-      const backendUrl =
-        import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-      const isVercel = backendUrl.includes("vercel.app");
-
-      const newSocket = io(isVercel ? backendUrl : backendUrl, {
-        path: isVercel ? "/api/socket.io" : "",
-        transports: ["polling", "websocket"],
-      });
+      const newSocket = io(
+        import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"
+      );
 
       newSocket.on("connect", () => {
         console.log("Connected to server with ID:", newSocket.id);
+        // Join room based on user role and ID
         if (userData.role === "driver") {
+          // Also emit driver availability when connecting
           newSocket.emit("join-room", userData._id, userData.role);
           console.log("Driver joined room:", `driver-${userData._id}`);
         } else {
           newSocket.emit("join-room", userData._id, userData.role);
         }
-      });
-
-      newSocket.on("connect_error", (error) => {
-        console.error("Connection error:", error);
-        // Fallback to polling if websockets fail
-        newSocket.io.opts.transports = ["polling", "websocket"];
       });
 
       setSocket(newSocket);

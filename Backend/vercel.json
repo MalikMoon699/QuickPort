@@ -4,23 +4,9 @@
     {
       "src": "src/server.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "api/socket.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
-    {
-      "src": "/api/socket.io",
-      "dest": "/api/socket.js",
-      "methods": ["GET", "POST"],
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type"
-      }
-    },
     {
       "src": "/(.*)",
       "dest": "src/server.js"

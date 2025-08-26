@@ -9,7 +9,6 @@ import Sidebar from "../components/Sidebar";
 import Map from "../components/Map";
 import Bottom from "../components/Bottom";
 import Request from "../components/Request";
-import { useE } from "react";
 
 const Rider = () => {
   const { userData } = useAuth();

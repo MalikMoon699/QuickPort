@@ -1,43 +1,44 @@
-// Frontend/src/context/SocketContext.jsx
-import React, { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { useAuth } from "./AuthContext";
-
-const SocketContext = createContext();
-
-export const useSocket = () => {
-  return useContext(SocketContext);
-};
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const { userData } = useAuth();
 
-useEffect(() => {
-  if (userData) {
-    const newSocket = io(
-      import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"
-    );
+  useEffect(() => {
+    if (userData) {
+      // For Vercel deployment
+      const backendUrl =
+        import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+      const isVercel = backendUrl.includes("vercel.app");
 
-    newSocket.on("connect", () => {
-      console.log("Connected to server with ID:", newSocket.id);
-      // Join room based on user role and ID
-      if (userData.role === "driver") {
-        // Also emit driver availability when connecting
-        newSocket.emit("join-room", userData._id, userData.role);
-        console.log("Driver joined room:", `driver-${userData._id}`);
-      } else {
-        newSocket.emit("join-room", userData._id, userData.role);
-      }
-    });
+      const newSocket = io(isVercel ? backendUrl : backendUrl, {
+        path: isVercel ? "/api/socket.io" : "",
+        transports: ["polling", "websocket"],
+      });
 
-    setSocket(newSocket);
+      newSocket.on("connect", () => {
+        console.log("Connected to server with ID:", newSocket.id);
+        if (userData.role === "driver") {
+          newSocket.emit("join-room", userData._id, userData.role);
+          console.log("Driver joined room:", `driver-${userData._id}`);
+        } else {
+          newSocket.emit("join-room", userData._id, userData.role);
+        }
+      });
 
-    return () => {
-      newSocket.close();
-    };
-  }
-}, [userData]);
+      newSocket.on("connect_error", (error) => {
+        console.error("Connection error:", error);
+        // Fallback to polling if websockets fail
+        newSocket.io.opts.transports = ["polling", "websocket"];
+      });
+
+      setSocket(newSocket);
+
+      return () => {
+        newSocket.close();
+      };
+    }
+  }, [userData]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
